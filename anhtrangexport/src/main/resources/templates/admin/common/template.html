@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+<title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">ANH TRANG EXPORT</title>
+<link rel="shortcut icon" th:href="@{/user/images/favicon.png}" type="image/png" />
+<link th:href="@{/user/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/user/css/icons.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/user/plugins/datatables/dataTables.bootstrap4.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/user/plugins/datatables/dataTables.checkboxes.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/user/plugins/datatables/buttons.bootstrap4.min.css}" rel="stylesheet" type="text/css" />
+<link th:href="@{/user/css/jquery.datetimepicker.css}" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+<link th:href="@{/user/css/jquery-ui.min.css}" rel="stylesheet" type="text/css">
+<link th:href="@{/user/css/multi-select.css}" rel="stylesheet" type="text/css">
+
+<!-- jQuery  -->
+<script th:src="@{/user/js/jquery.min.js}"></script>
+<script th:src="@{/user/js/popper.min.js}"></script>
+<script th:src="@{/user/js/bootstrap.min.js}"></script>
+<script th:src="@{/user/js/modernizr.min.js}"></script>
+<script th:src="@{/user/js/detect.js}"></script>
+<script th:src="@{/user/js/fastclick.js}"></script>
+<script th:src="@{/user/js/jquery.slimscroll.js}"></script>
+<script th:src="@{/user/js/jquery.blockUI.js}"></script>
+<script th:src="@{/user/js/waves.js}"></script>
+<script th:src="@{/user/js/jquery.nicescroll.js}"></script>
+<script th:src="@{/user/js/jquery.scrollTo.min.js}"></script>
+<script th:src="@{/user/js/jquery.datetimepicker.full.js}"></script>
+<script th:src="@{/user/js/jquery-ui.min.js}"></script>
+<script th:src="@{/user/js/jquery.multi-select.js}"></script>
+<script th:src="@{/user/js/jquery.quicksearch.js}"></script>
+<script th:src="@{/user/js/print.min.js}"></script>
+
+<!-- Required datatable js -->
+<script th:src="@{/user/plugins/datatables/jquery.dataTables.min.js}"></script>
+<script th:src="@{/user/plugins/datatables/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/user/plugins/datatables/dataTables.checkboxes.min.js}"></script>
+<link th:href="@{/user/css/style.css}" rel="stylesheet" type="text/css" />
+<script th:inline="javascript">
+	$.datetimepicker.setLocale('vi');
+	$(function() {
+		$('input.number').keyup(function(event) {
+			// skip for arrow keys
+			if (event.which >= 37 && event.which <= 40)
+				return;
+
+			// format number
+			$(this).val(function(index, value) {
+				return formatNumber(value);
+			});
+		});
+		$('input.number').each(function(index, value) {
+			$(this).val(function(index, value) {
+				return formatNumber(value);
+			});
+		});
+	});
+
+	function formatNumber(value) {
+		if (value == "-") {
+			return value;
+		}
+		var sign = "";
+		if (value && Number(getOnlyDigit(value)) < 0) {
+			sign = "-";
+		}
+		return sign
+				+ getOnlyDigit(value).replace(/\D/g, "").replace(
+						/\B(?=(\d{3})+(?!\d))/g, ".");
+	}
+
+	function getOnlyDigit(value) {
+		return String(value).replace(/[^\d-]/g, "");
+	}
+
+	function parseNumber() {
+		$('input.number').each(function(index, value) {
+			$(this).val(function(index, value) {
+				return getOnlyDigit(value);
+			});
+		});
+
+		return true;
+	}
+</script>
+</head>
+<body>
+	<div id="wrapper" style="margin-bottom:70px;">
+		<!-- Start content -->
+		<div class="content">
+			<div th:replace="admin/common/header::header"></div>
+			<div class="page-content-wrapper">
+				<div class="container-fluid">
+					<div layout:fragment="content">empty</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="admin/common/footer::footer"></div>
+	<script th:src="@{/user/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "expoServerPort": 19000,
+  "expoServerNgrokUrl": "https://zh-z4w.linkin.anhtrangexportapp.exp.direct",
+  "packagerNgrokUrl": "https://packager.zh-z4w.linkin.anhtrangexportapp.exp.direct",
+  "ngrokPid": 15516,
+  "devToolsPort": 19002,
+  "packagerPort": 19001,
+  "packagerPid": 7552,
+  "webpackServerPort": null
+}

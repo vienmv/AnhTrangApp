@@ -1,0 +1,18 @@
+<div th:fragment="header" th:remove="tag" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<nav class="navbar navbar-expand-lg navbar-dark static-top" style="background-color: #5cb85c">
+		<div class="container">
+			<a class="navbar-brand" th:href="@{/member/home}"><img th:src="@{/client/images/logo.png}" width="100" class="img-responsive center-block"></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				<img style="width: 30px; height: 30px" th:src="@{/user/images/info-user.png}">
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item"><a class="nav-link" th:href="@{/member/profile}">Hồ Sơ</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/member/doi-mat-khau}">Mật Khẩu</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/dang-xuat}">Thoát</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</div>

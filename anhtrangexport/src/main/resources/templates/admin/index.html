@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	layout:decorator="admin/common/template">
+<head>
+<meta charset="utf-8">
+<title>App Dầu Đen</title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<div class="container">
+			<div class="row" style="margin-bottom: 20px; margin-top: 20px;"
+				sec:authorize="hasAnyRole('ROLE_ADMIN')">
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/order/list}"><img style="padding: 15px;"
+							class="card-img-top" th:src="@{/user/images/order.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a style="" th:href="@{/admin/order/list}">Đơn hàng</a>
+							</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/user-group/list}"><img
+							style="padding: 15px;" class="card-img-top"
+							th:src="@{/user/images/userGroup1.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a th:href="@{/admin/user-group/list}">Quản Lí Group</a>
+							</h5>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/accounts}"><img style="padding: 15px;"
+							class="card-img-top" th:src="@{/user/images/user.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a style="" th:href="@{/admin/accounts}">Người dùng</a>
+							</h5>
+							<p class="card-text"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="margin-bottom: 20px; margin-top: 20px;"
+				sec:authorize="hasAnyRole('ROLE_ADMIN')">
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/news/list}"><img style="padding: 15px;"
+							class="card-img-top" th:src="@{/user/images/tintuc1.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a th:href="@{/admin/news/list}">Tin Tức</a>
+							</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/notifications}"><img
+							style="padding: 15px;" class="card-img-top"
+							th:src="@{/user/images/thongbao.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a style="" th:href="@{/admin/notifications}">Thông Báo</a>
+							</h5>
+							<p class="card-text"></p>
+						</div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card h-100">
+						<a th:href="@{/admin/version/list}"><img
+							style="padding: 15px;" class="card-img-top"
+							th:src="@{/user/images/version1.png}"></a>
+						<div class="card-body" style="padding: 0.72rem;">
+							<h5 class="card-title"
+								style="text-align: center; font-size: 14px; font-style: oblique;">
+								<a th:href="@{/admin/version/list}">Bản Cập Nhật</a>
+							</h5>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

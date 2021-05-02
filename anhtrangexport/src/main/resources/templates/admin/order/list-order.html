@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title>Order</title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<script>
+			$(function() {
+				$("#toDate").datetimepicker({
+					format : 'd/m/Y H:i',
+					timepicker : true
+				})
+				$("#fromDate").datetimepicker({
+					format : 'd/m/Y H:i',
+					timepicker : true
+				})
+			})
+		</script>
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 col-6">
+								<h4 class="header-title">Đơn Hàng</h4>
+							</div>
+							<div class="col-md-6 col-6">
+								<!-- <a data-toggle="modal" href="" data-target="#add-order"
+									class="pull-right btn btn-primary"><img
+									th:src="@{/user/images/add.png}" height="20" />Tạo đơn công ty</a> -->
+								<a data-toggle="modal" href="" data-target="#add-order-customer"
+									class="pull-right btn btn-danger"><img
+									th:src="@{/user/images/add.png}" height="20" />Tạo đơn hàng</a> <a
+									data-toggle="modal" href="" data-target="#confirm-export-exel"
+									class="pull-right btn btn-success"><img
+									th:src="@{/user/images/export-exel.png}" height="20" />Xuất
+									Excel</a>
+							</div>
+						</div>
+						<hr />
+						<div class="row">
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Mô tả, ghi chú'"></label>:
+									<input id="nameSearch"
+										th:placeholder="'Mô tả, ghi chú, địa chỉ'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Người Ship'"></label>: <input
+										id="nameSearchShip" th:placeholder="'Tên người ship'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Người Bán'"></label>: <input
+										id="nameSearchSell" th:placeholder="'Tên người bán'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Khách hàng lẻ'"></label>:
+									<input id="nameSearchCustomer" th:placeholder="'Tên khách lẻ'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3 col-6">
+								<div class="form-group">
+									<label class="control-label">Từ Ngày</label>: <input
+										name="fromDate" id="fromDate" placeholder="Từ Ngày"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-md-3 col-6">
+								<div class="form-group">
+									<label class="control-label">Tới Ngày</label>: <input
+										name="toDate" id="toDate" placeholder="Tới ngày"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Trạng thái'"></label>: <select
+										class="form-control form-control-sm" id="statusSearch">
+										<option th:text="'Tất cả'" value=""></option>
+										<option th:text="'Mới'" th:value="1"></option>
+										<option th:text="'Chờ ship'" th:value="2"></option>
+										<option th:text="'Hoàn Thành'" th:value="3"></option>
+										<option th:text="'Hủy'" th:value="4"></option>
+									</select>
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'City'"></label>							
+									<select class="form-control form-control-sm" id="searchCityId" name="cityName" >										
+									</select>																	
+								</div>
+							</div>
+							<div class="col-6 col-md-3">
+								<div class="form-group">
+									<label class="control-label">&nbsp;</label>
+									<button class="form-control form-control-sm btn btn-success"
+										onclick="table.draw()">Refresh</button>
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="table-responsive">
+							<table id="datatable" class="table table-bordered">
+								<thead>
+									<tr>
+										<th></th>
+										<th th:text="'ID'"></th>
+										<th th:text="'Khách hàng'"></th>
+										<th th:text="'Thực nhận'"></th>
+										<th th:text="'Shipper'"></th>
+										<th th:text="'Seller'"></th>
+										<th th:text="'Người tạo'"></th>
+										<th th:text="'Nhận xét và đánh giá'"></th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<th colspan="2"><button id="delButt"
+												class="btn btn-danger">
+												<i class="fa fa-trash"></i>Xóa tất
+											</button></th>
+										<th th:text="'Khách hàng'"></th>
+										<th th:text="'Thực nhận'"></th>
+										<th th:text="'Shipper'"></th>
+										<th th:text="'Seller'"></th>
+										<th th:text="'Người tạo'"></th>
+										<th th:text="'Nhận xét và đánh giá'"></th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">Bạn muốn xoá đơn hàng có id sau?</div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<button class="btn btn-danger btn-ok" th:text="#{text.delete}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-export-exel" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<button class="btn btn-success btn-ok" th:text="#{text.yes}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete-multi" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="#{user.delete.confirm.message}"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<button class="btn btn-danger btn-ok" th:text="#{text.delete}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="please-select-dialog" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">Vui lòng tích chọn các dòng để xoá?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.cancel}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="add-order-customer" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title" th:text="'Tạo đơn hàng'"></h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal"
+							onsubmit="addOrderCustomer();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Đơn vị tính'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Đơn vị tính'" id="unit" name="unit"
+										value="Kg" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Số lượng'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control number"
+										type="text" th:placeholder="'Số lượng'" id="weight"
+										name="weight" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Mô tả</label>
+								<div class="col-sm-9">
+									<textarea required="required" class="form-control"
+										id="description" name="description"
+										placeholder="Ghi chú đơn hàng"></textarea>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Nhà cung cấp</label>
+								<div class="col-sm-6">
+									<input type="text" class="form-control" id="customerName" required="required"
+										name="customerName" placeholder="Chọn nhà cung cấp" />
+								</div>
+								<div class="col-sm-3">
+									<input type="number" readonly class="form-control"
+										id="customerId" name="customerId" placeholder="ID khách hàng" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Ẩn seller:</label>
+								<div class="col-sm-9">
+									<input class="form-control" type="checkbox" id="hideOrder" style="margin-left: -160px;"
+										name="hideOrder" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-sm-3"></div>
+								<div class="form-group col-sm-9">
+									<div>
+										<button id="addButton" type="submit"
+											class="btn btn-primary waves-effect waves-light"
+											th:text="'Tạo đơn hàng'"></button>
+										<button type="button"
+											class="btn btn-danger waves-effect waves-light"
+											data-dismiss="modal" th:text="#{text.cancel}"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div class="modal fade" id="add-order" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title" th:text="'Tạo đơn hàng khách hợp đồng'"></h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal"
+							onsubmit="addOrderCompany();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Đơn vị tính'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Đơn vị tính'" id="unit" name="unit"
+										value="Kg" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Số lượng'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Số lượng'" id="weight" name="weight" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Mô tả</label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control"
+										id="description" name="description"
+										placeholder="Nơi lấy hàng, thời gian">
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<div class="col-sm-3"></div>
+								<div class="form-group col-sm-9">
+									<div>
+										<button id="addButton" type="submit"
+											class="btn btn-primary waves-effect waves-light"
+											th:text="#{text.add}"></button>
+										<button type="button"
+											class="btn btn-danger waves-effect waves-light"
+											data-dismiss="modal" th:text="#{text.cancel}"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div> -->
+		<div class="modal fade" id="update-order" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title">Sửa Đơn Hàng</h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal"
+							onsubmit="updateOrder();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'ID'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" readonly
+										type="text" th:placeholder="'ID'" id="id" name="id" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Đơn vị</label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Đơn vị'" id="unit" name="unit" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Số lượng'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control number"
+										type="text" th:placeholder="'Số lượng'" id="weight"
+										name="weight" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Mô tả'"></label>
+								<div class="col-sm-9">
+									<textarea class="form-control" th:placeholder="'Mô tả'"
+										id="description" name="description"></textarea>
+								</div>
+							</div>
+							<hr />
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Thực nhận'"></label>
+								<div class="col-sm-9">
+									<input class="form-control number" type="text"
+										th:placeholder="'Thực nhận'" id="realWeight" name="realWeight" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Giá'"></label>
+								<div class="col-sm-9">
+									<input class="form-control number" type="text"
+										th:placeholder="'Giá'" id="price" name="price" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Ghi chú'"></label>
+								<div class="col-sm-9">
+									<textarea class="form-control" th:placeholder="'Ghi Chú'"
+										id="note" name="note"></textarea>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Giá Ship'"></label>
+								<div class="col-sm-9">
+									<input class="form-control number" th:placeholder="'Giá Ship'"
+										id="cost" name="cost"/>
+								</div>
+							</div>
+							<hr />	
+							<div class="form-group row">
+								<label class="col-sm-3 form-label">Nhà cung cấp </label>
+								<div class="col-6">
+									<input type="text" class="form-control" id="customerName"
+										name="customerName" placeholder="Chọn nhà cung cấp" />
+								</div>
+								<div class="col-3">
+									<input type="number" readonly class="form-control"
+										id="customerId" name="customerId" placeholder="ID khách hàng" />
+								</div>
+							</div>
+							<!-- <div class="form-group row">
+								<label class="col-sm-3 form-label">Seller</label>
+								<div class="col-6">
+									<input type="text" class="form-control" id="sellerName"
+										name="sellerName" placeholder="Chọn seller" />
+								</div>
+								<div class="col-3">
+									<input type="number" readonly class="form-control"
+										id="sellerId" name="sellerId" placeholder="ID seller" />
+								</div>
+							</div> -->
+							<div class="form-group row">
+								<label class="col-3 form-label">Ẩn seller:</label>
+								<div class="col-9">
+									<input class="form-control" type="checkbox" id="hideOrder" style="margin-left: -160px;"
+										name="hideOrder" />
+								</div>
+							</div>
+							<!-- <div class="form-group row">
+								<label class="col-sm-3 form-label">Shipper</label>
+								<div class="col-6">
+									<input type="text" class="form-control" id="shipperName"
+										name="shipperName" placeholder="Chọn shipper" />
+								</div>
+								<div class="col-3">
+									<input type="number" readonly class="form-control"
+										id="shipperId" name="shipperId" placeholder="ID Shipper" />
+								</div>
+							</div> -->
+							<hr />
+							<div class="form-group row">
+								<label class="col-sm-12 form-label">Hoặc chọn các
+									shippers</label>
+								<div class="col-sm-12">
+									<select id='shippers' multiple='multiple'>
+									</select>
+								</div>
+							</div>
+							<hr />
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Trạng Thái'"></label>
+								<div class="col-sm-9">
+									<select required="required" class="form-control" id="status"
+										name="status">
+										<option th:text="'Mới'" value="1"></option>
+										<option th:text="'Chờ ship'" value="2"></option>
+										<option th:text="'Hoàn Thành'" value="3"></option>
+										<option th:text="'Hủy'" value="4"></option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3"></label>
+								<div class="col-sm-9">
+									<button id="addButton" type="submit"
+										class="btn btn-primary waves-effect waves-light"
+										th:text="'Cập Nhật'"></button>
+									<button type="button"
+										class="btn btn-danger waves-effect waves-light"
+										data-dismiss="modal" th:text="#{text.cancel}"></button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="update-cost" tabindex="-1" role="dialog"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title">Sửa Giá Shipp</h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal"
+							onsubmit="updateCost();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'ID'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" readonly
+										type="text" th:placeholder="'ID'" id="id" name="id" />
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Giá'"></label>
+								<div class="col-sm-9">
+									<input class="form-control number" type="text"
+										th:placeholder="'Giá'" id="cost" name="cost" />
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<label class="col-sm-3"></label>
+								<div class="col-sm-9">
+									<button id="addButton" type="submit"
+										class="btn btn-primary waves-effect waves-light"
+										th:text="'Cập Nhật'"></button>
+									<button type="button"
+										class="btn btn-danger waves-effect waves-light"
+										data-dismiss="modal" th:text="#{text.cancel}"></button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var vietnameseUrl = [[@{/user/plugins/datatables/Vietnamese.json}]];
+	    var url = [[@{/api/member/order/list}]];
+	    var editUrl = [[@{/api/admin/order/update}]];
+	    var editCostUrl = [[@{/api/admin/order/update-cost}]];
+	    var delUrl = [[@{/api/admin/order/delete}]];
+	    var delMultiUrl = [[@{/api/admin/order/delete-multi}]];
+	    var addOrderURL = [[@{/api/member/order/add}]];
+	    var csrf_token = [[${_csrf.token}]];
+	    var searchHolderText = [[#{user.search.holder}]];
+	    var exportExelUrl = [[@{/admin/order/excel/export}]];
+		var downloadExelUrl = [[@{/admin/file/}]];
+		var searchDTO = {};
+        var staffURL = [[@{/api/admin/accounts}]];
+        var localJson = [[@{/user/cityJson/local.json}]];
+        
+	    var id = "";
+	    var table;
+	    var newFlag = false;
+      
+		$(document).ready(function() {
+		    window.setInterval(function(){
+		    	$.ajax({
+			        url : url,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({"status": 1}),
+			        success: function(resp){
+			        	if (resp.data.length > 0) {
+				        	
+			        	}
+				    },
+			    })
+		    }, 30000);//load lai 30s
+			table = $('#datatable').DataTable( {
+				"searching": false,
+				"processing": true,
+		        "serverSide": true,
+		        "ajax": {
+		        	type:"POST",
+		            url: url,
+		            dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: function ( d ) {
+		            	if ($("#roleIdSearch").val() == "") {
+			            	d.roleList = ["ROLE_ADMIN", "ROLE_MEMBER", "ROLE_SELLER", "ROLE_SHIPPER"];
+		            	} else {
+		            		d.roleList = [$("#roleIdSearch").val()];
+		            	}
+		            	d.toDate = $('#toDate').val();
+		              	d.fromDate = $('#fromDate').val();	 
+		            	d.search.value = $("#nameSearch").val();
+		            	d.shiperName = $("#nameSearchShip").val();
+		            	d.sellerName = $("#nameSearchSell").val();
+		            	d.status = $("#statusSearch").val();
+		            	d.customerName = $("#nameSearchCustomer").val();
+		            	if ($("#searchCityId").val() == "") {
+			            	d.searchCity = null;
+		            	} else {
+		            		d.searchCity = $("#searchCityId").val();
+		            	}	
+		            	searchDTO = d
+		            	return JSON.stringify( d );
+		            }
+		        },
+		        "lengthMenu": [10, 25, 50, 100, 200],
+		        "columns": [
+		        	{ "data": "id" },
+		            { "data": "id" },
+		            { "data": "customerName" },
+		            { "data": "note" },
+		            { "data": "shipperName" },
+		            { "data": "sellerName" },
+		            { "data": "createdBy" },
+		            { "data": "review" },
+		            { "data": "id" }
+		        ],
+		        "order": [1, "desc"],
+		        "select": {
+		        	'style': 'multi'
+		        },
+		        "columnDefs": [
+					{
+					    'targets': 0,
+					    'checkboxes': {
+					       'selectRow': true
+					    }
+					},
+					{
+		                "render": function ( data, type, row ) {
+		                	if (row.status == 1) {
+		                		return '<span class="label label-warning">' + row.id + " - Mới</span>"
+		                	} else if (row.status == 2) {
+		                		return '<span class="label label-primary">' + row.id + " - Chờ ship</span>"
+		                	} else if (row.status == 3) {
+		                		return '<span class="label label-success">' + row.id + " - Hoàn thành</span>"
+		                	} else if (row.status == 4) {
+		                		return '<span class="label label-danger">' + row.id + " - Hủy</span>"
+		                	}
+		                	return "";
+		                },
+		                "width": '10%',
+		                "targets": 1
+		            },
+					{
+						"render": function (data, type, row) {
+							 let str = "";
+							 
+							 str += "SL: <strong>" + formatNumber(row.weight) + " " + row.unit + "</strong>";
+							 str += "<br>Ngày: " + row.createdDate;
+							 str += "<br><i>" + row.description + "</i>";
+							 //str += "<br><i>" + row.cityName + " - " + row.districtName + " - " + row.wardsName + " - " + row.address + "</i>";
+							 str += "<br><i>" + row.address + " - " + row.wardsName + " - " + row.districtName + " - " + row.cityName + "</i>";
+							 str += "<br><i>" + row.customerName + "</i>";
+							 str += "<br><i>" + row.phoneCustomer + "</i>";
+							 
+							 return str;
+						},
+						"width": '25%',
+						"targets": 2
+			        },
+
+			        {
+						"render": function (data, type, row) {
+							 let str = "";
+							 if(row.realWeight != null) {
+							 	str += "SL: <strong>" + formatNumber(row.realWeight) + "</strong>"
+							 	str += "<br> Giá: <strong>" + formatNumber(row.price) + "</strong>"
+							 	str += "<br>Ngày: " + row.updatedDate;
+								str += "<br><i>" + row.note + "</i>";
+								str += "<br> Giá Ship: <strong>" + formatNumber(row.cost) + "</strong>"
+								str += "<br> Tổng tiền: <strong>" + formatNumber(row.cost * row.realWeight) + "</strong>"
+							 }
+							 return str;
+						},
+						"width": '20%',
+						"targets": 3
+			        },
+			        {
+						"render": function (data, type, row) {
+							 let str = "";
+							 if(row.shipperId != null) {
+								 str += row.shipperName + " (ID: " + row.shipperId + ")"
+							 }
+							 return str;
+						},
+						"width": '10%',
+						"targets": 4
+			        },
+     		     
+			        {
+						"render": function (data, type, row) {
+							 let str = "";
+							 if(row.sellerId != null) {
+								 if(row.hideOrder) {
+									 str += "<span class='text-danger'>(Bị ẩn)</span><br>"	 
+								 }
+								 str += row.sellerName + " (ID: " + row.sellerId + ")"
+							 }
+							 return str;
+						},
+						"width": '10%',
+						"targets": 5
+			        },
+			        {
+						"render": function (data, type, row) {
+							 let str = "";
+							 if(row.review != null || row.starRating != null) {
+								 str += "<span>" + row.review + "</span><br>"	 
+								 if(row.starRating == 1)
+								 	str += "<span>Hài lòng</span><br>"	
+								 else if(row.starRating == 2)	
+									 str += "<span>Bình thường</span><br>"	
+								 else if(row.starRating == 3)	
+									 str += "<span>Không hài lòng</span><br>"
+							 }
+							 return str;
+						},
+						"targets": 7
+			        },
+		            
+			   		{
+		   	                "render": function ( data, type, row ) {
+		   	                	var content =  '';
+		   	                	content += '<button data-toggle="modal" data-target="#update-order" data-json="' + encodeURI(JSON.stringify(row)) +'" class="btn btn-primary"><i class="fa fa-pencil-alt"></i>Sửa</button>'
+			              		content +='<button class="btn btn-danger" data-toggle="modal" data-target="#confirm-delete" data-json='+ encodeURI(JSON.stringify(row))+'><i class="fa fa-trash"></i>Xóa</button>'
+			              		if(row.status == 3) {
+			              			content += '<button data-toggle="modal" data-target="#update-cost" data-json="' + encodeURI(JSON.stringify(row)) +'" class="btn btn-info"><i class="fa fa-pencil-alt"></i>Giá shipp</button>'
+			              		}
+			              		return content;
+		   	                },
+							"orderable" : false,
+		   	                "targets": 8
+	  	            	},  
+		        ],
+		        "language": {
+		            "url": vietnameseUrl,
+		            "searchPlaceholder": searchHolderText
+		        },
+		        "initComplete": function(settings, json) {
+		        	$('#fromDate, #statusSearch, #toDate, #searchCityId').change(function (e) {
+						table.draw();
+				    });
+		        	$("#nameSearch, #nameSearchShip, #nameSearchSell, #nameSearchCustomer").keyup(function(){
+		        		table.draw();
+		        	})
+		        },
+		        "drawCallback": function (settings) {
+	                const json = settings.json
+	            }
+	        });
+			
+			$('#datatable tbody').on( 'click', 'tr', function () {
+				var data = table.row($(this)).data();
+				id = data.id;
+		    })
+		    
+		   //load data dropdown shipper
+		  /*   $.ajax({
+		        url : staffURL,
+		        type: 'POST',
+		        dataType: "json",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+	            data: JSON.stringify({ "start": null, roleList: ["ROLE_SHIPPER"], "search": { "value": $("#update-order #shipperName").val() } }),
+		        success: function(resp){
+		        	resp.data.forEach(function(v){
+		        		$('#shippers').append("<option value='" + v.id + "'>" + v.name + "</option>");
+		        	})
+	                $('#shippers').multiSelect()
+			    },
+		    }) */
+		    
+			$('#update-order').on('show.bs.modal', function(e) {
+				
+				$("#update-order #shippers").html('');
+				$("#update-order #shippers").multiSelect("refresh");
+				
+			    //get data-id attribute of the clicked element
+				var jsonStr = $(e.relatedTarget).data('json');
+			  	var row = JSON.parse(decodeURI(jsonStr));		  	
+			  
+			  	getShipper(row);
+			    //populate the textbox
+			  	 $("#update-order #unit").val(row.unit);
+			  	 $("#update-order #weight").val(formatNumber(row.weight));
+			  	 $("#update-order #description").val(row.description);
+
+			  	 $("#update-order #note").val(row.note);
+			  	 $("#update-order #realWeight").val(formatNumber(row.realWeight));
+			  	 $("#update-order #price").val(formatNumber(row.price));
+			  	 $("#update-order #cost").val(formatNumber(row.cost));
+			  	
+			  	 $("#update-order #status").val(row.status);
+				 $("#update-order #id").val(row.id);
+				 
+				 $("#update-order #sellerName").val(row.sellerName);
+				 $("#update-order #sellerId").val(row.sellerId);
+				 $("#update-order #hideOrder").prop('checked', row.hideOrder);
+				 
+				 /* $("#update-order #shipperId").val(row.shipperId);
+				 $("#update-order #shipperName").val(row.shipperName);
+				 $("#update-order #shipperName").val(row.shipperName); */
+				 
+
+                 $("#update-order #customerName").val(row.customerName);
+				 $("#update-order #customerId").val(row.customerId);
+				 
+				 if (row.type == 2) {
+					 $("#update-order #customerName").prop("disabled","disabled");
+				 } else {
+					 $("#update-order #customerName").removeAttr("disabled");
+				 }
+				 
+			});
+			
+			$('#update-cost').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+				var jsonStr = $(e.relatedTarget).data('json');
+			  	var row = JSON.parse(decodeURI(jsonStr));
+			    //populate the textbox			  	
+				 $("#update-cost #id").val(row.id);
+				 $("#update-cost #cost").val(formatNumber(row.cost));
+			});
+			
+			$('#confirm-delete').on('click', '.btn-ok', function(e) {
+			  var $modalDiv = $(e.delegateTarget);
+			  $.ajax({
+			        url : delUrl + '/' + id,
+			        type: 'DELETE',
+			        dataType: "text",
+		            contentType: "application/json",
+			        success: function(data){
+			        	$modalDiv.modal('hide');
+			        	table.ajax.reload( null, false );
+				    },
+			        error: function(error){
+			        	if (error.status == 409) {
+			        		$modalDiv.find('div.modal-body').html('<b>Đơn hàng không thể xoá.</b>');
+						}
+			        }
+			    })
+			})
+			
+			//triggered when modal is about to be shown
+			$('#confirm-delete').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var jsonStr = $(e.relatedTarget).data('json');
+			  	var row = JSON.parse(decodeURI(jsonStr));
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>ID: ' + row.id + '</strong>');
+			});
+			
+			$('#confirm-export-exel').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $modalDiv.find('div.modal-body').html('<strong>Đang tạo file excel. Vui lòng đợi chút nhé!</strong>');
+				  $.ajax({
+				        url: exportExelUrl,
+				        method: 'POST',
+				        dataType: 'text',
+				        contentType: 'application/json;charset=UTF-8',
+				        headers: {'X-CSRF-TOKEN': csrf_token},
+			            data: JSON.stringify(searchDTO),
+				        success: function (data) {
+				            $modalDiv.modal('hide');
+				        	window.location.href=downloadExelUrl + data;
+				        }
+				  });
+			});
+			
+			$('#confirm-export-exel').on('show.bs.modal', function(e) {
+			    $(e.currentTarget).find('div.modal-body').html('<strong>Bạn muốn xuất danh sách đơn hàng ra exel?</strong>');
+			});
+			
+			// Handle form submission event
+			var rowIds = [];
+			$('#delButt').on('click', function(e){
+			    var rows_selected = table.column(0).checkboxes.selected();
+			    rowIds = [];
+			    // Iterate over all selected checkboxes
+			    $.each(rows_selected, function(index, rowId){
+			       // Create a hidden element
+			       rowIds.push(rowId);
+			    });
+			    if (rows_selected.length == 0) {
+			    	$("#please-select-dialog").modal('show');
+			    } else {
+			    	$("#confirm-delete-multi").modal('show');
+			    }
+		 	});
+			
+			$('#confirm-delete-multi').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.ajax({
+				        url : delMultiUrl + '/' + rowIds.toString(),
+				        type: 'DELETE',
+				        dataType: "text",
+			            contentType: "application/json",
+			            headers: {'X-CSRF-TOKEN': csrf_token},
+				        success: function(data){
+				        	$modalDiv.modal('hide');
+				        	table.ajax.reload( null, false );
+					    }
+				  })
+			})
+			
+        $("#update-order #sellerName").autocomplete({
+        	source: function (request, response) {
+            	$.ajax({
+			        url : staffURL,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": 0, roleList: ["ROLE_SELLER"], "search": { "value": $("#update-order #sellerName").val() } }),
+			        success: function(resp){
+			        	const data = ($.map(resp.data, function (item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                data: item
+                            }
+                        }))
+                        data.unshift({
+	                            label: 'Chọn seller',
+	                            value: 'Chọn seller',
+	                            data: { id: null }
+	                        })
+	                        response(data)
+	                        console.log(data)
+				    },
+			    })
+            },
+            minLength: 0,
+            select: function (event, ui) {
+                $("#update-order #sellerId").val(ui.item.data.id)
+            }
+        }).focus(function () {
+            $(this).autocomplete("search");
+        })
+        
+       /*  $("#update-order #shipperName").autocomplete({
+        	source: function (request, response) {
+            	$.ajax({
+			        url : staffURL,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": 0, customerId: $("#update-order #customerId").val(),roleList: ["ROLE_SHIPPER"], "search": { "value": $("#update-order #shipperName").val() } }),
+			        success: function(resp){
+			        	const data = ($.map(resp.data, function (item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                data: item
+                            }
+                        }))
+                        data.unshift({
+	                            label: 'Chọn ship',
+	                            value: 'Chọn ship',
+	                            data: { id: null }
+	                        })
+	                        response(data)
+	                        console.log(data)
+				    },
+			    })
+            },
+            minLength: 0,
+            select: function (event, ui) {
+                $("#update-order #shipperId").val(ui.item.data.id)
+            }
+        }).focus(function () {
+            $(this).autocomplete("search");
+        }) */
+    
+        var customerURL = [[@{/api/admin/accounts}]];
+        $("#add-order-customer #customerName").autocomplete({
+        	source: function (request, response) {
+            	$.ajax({
+			        url : customerURL,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": 0, roleList: ["ROLE_MEMBER"], "search": { "value": $("#add-order-customer #customerName").val() } }),
+			        success: function(resp){
+			        	const data = ($.map(resp.data, function (item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                data: item
+                            }
+                        }))
+                        data.unshift({
+	                            label: 'Chọn nhà cung cấp',
+	                            value: 'Chọn nhà cung cấp',
+	                            data: { id: null }
+	                        })
+                        response(data)
+				    },
+			    })
+            },
+            minLength: 0,
+            select: function (event, ui) {
+                $("#add-order-customer #customerId").val(ui.item.data.id)
+            }
+        }).focus(function () {
+            $(this).autocomplete("search");
+        })
+        
+        $("#update-order #customerName").autocomplete({
+        	source: function (request, response) {
+            	$.ajax({
+			        url : customerURL,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": 0, roleList: ["ROLE_MEMBER"], "search": { "value": $("#update-order #customerName").val() } }),
+			        success: function(resp){
+			        	const data = ($.map(resp.data, function (item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                data: item
+                            }
+                        }))
+                        data.unshift({
+	                            label: 'Chọn khách hàng',
+	                            value: 'Chọn khách hàng',
+	                            data: { id: null }
+	                        })
+                        response(data)
+				    },
+			    })
+            },
+            minLength: 0,
+            select: function (event, ui) {
+                $("#update-order #customerId").val(ui.item.data.id)
+            }
+        }).focus(function () {
+            $(this).autocomplete("search");
+        })
+			
+        var addressCompanyUrl = [[@{/api/member/address-company/search}]];
+        $("#add-order #description").autocomplete({
+        	source: function (request, response) {
+            	$.ajax({
+			        url : addressCompanyUrl,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": 0, "search": { "value": $("#add-order #description").val() } }),
+			        success: function(resp){
+			        	const data = ($.map(resp.data, function (item) {
+                            return {
+                                label: item.name + ' - ' + item.address,
+                                value: item.name + ' - ' + item.address,
+                                data: item
+                            }
+                        }))
+	                 	response(data)
+				    },
+			    })
+            },
+            minLength: 0,
+        }).focus(function () {
+            $(this).autocomplete("search");
+        })
+	 });
+		
+		function addOrderCompany() {
+			var data = {};
+			$("#add-order form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			data.type = 2
+			$.ajax({
+		        url : addOrderURL,
+		        type: 'POST',
+		        dataType: "json",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(data){
+		        	$('#add-order').modal('hide');
+			    	table.draw();
+		        	$("#add-order form")[0].reset();
+			    },
+		        error: function(error){
+		        }
+		    })
+			return false;
+		}
+		
+		var addOrderCustomerURL =[[@{/api/member/order/add}]];
+		function addOrderCustomer() {
+			parseNumber();
+			var data = {};
+			$("#add-order-customer form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			data.hideOrder = $("#add-order-customer #hideOrder").is(":checked")	
+			$.ajax({
+		        url : addOrderCustomerURL,
+		        type: 'POST',
+		        dataType: "json",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(data){
+		        	$('#add-order-customer').modal('hide');
+			    	table.draw();
+		        	$("#add-order-customer form")[0].reset();
+			    },
+		        error: function(error){
+		        }
+		    })
+			return false;
+		}
+		
+		function updateOrder() {
+			parseNumber();
+			var data = {};
+			$("#update-order form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			data.shippers = $("#shippers option[selected]").map(function(i, el) {
+			    return $(el).val();
+			}).get();
+			data.hideOrder = $("#update-order #hideOrder").is(":checked")	
+			$.ajax({
+		        url : editUrl,
+		        type: 'PUT',
+		        dataType: "text",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function() {
+		        	$('#update-order').modal('hide');
+			    	table.ajax.reload( null, false );
+			    },
+		        error: function(error) {
+		        }
+		    });
+			return false;
+		}
+		
+		 $(function() {
+			$("#toDate").datetimepicker({
+				format : 'd/m/Y',
+				timepicker : false
+			});
+			$("#fromDate").datetimepicker({
+				format : 'd/m/Y',
+				timepicker : false
+			});
+		});
+		 
+		 function updateCost() {
+				parseNumber();
+				var data = {};
+				$("#update-cost form").serializeArray().map(function(x) {
+					data[x.name] = x.value;
+				});
+				
+				$.ajax({
+			        url : editCostUrl,
+			        type: 'PUT',
+			        dataType: "text",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+			        data: JSON.stringify(data),
+			        success: function() {
+			        	$('#update-cost').modal('hide');
+				    	table.ajax.reload( null, false );
+				    },
+			        error: function(error) {
+			        }
+			    });
+				return false;
+			}
+			
+			function getShipper(row) {
+				//load data dropdown shipper
+			    $.ajax({
+			        url : staffURL,
+			        type: 'POST',
+			        dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: JSON.stringify({ "start": null, searchRoad: row.cityName, roleList: ["ROLE_SHIPPER"], "search": { "value": $("#update-order #shipperName").val() } }),
+			        success: function(resp){
+			        	resp.data.forEach(function(v){
+			        		$('#update-order #shippers').append("<option value='" + v.id + "'>" + v.name + "</option>");
+			        	})
+		                $('#update-order #shippers').multiSelect()
+		                			 
+						$("#update-order #shippers").val(row.shippers);
+						$("#update-order #shippers").multiSelect("refresh");
+				    },
+			    })
+			}
+			
+			var cities = [];
+	        $.getJSON( localJson, function(json) {
+	        	cities = json;
+	        	
+	        	$('#searchCityId').append("<option value=''>--</option>").attr('selected', true);
+	        	
+	        	json.forEach(function(v){
+	       			$('#searchCityId').append("<option value='" + v.name + "'>" + v.name + "</option>").attr('selected', true);
+	       		});
+	        	
+	       	}) ;
+		</script>
+	</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1023858705708",
+    "firebase_url": "https://appanhtrang-db7ec.firebaseio.com",
+    "project_id": "appanhtrang-db7ec",
+    "storage_bucket": "appanhtrang-db7ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023858705708:android:e8c3e90bae717298279889",
+        "android_client_info": {
+          "package_name": "com.linkin.anhtrangexport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1023858705708-v1advd9v26aplpf8hq3j8t4jtfptc12a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcVqR6Gc15XHDDbqMB5j1uWZA8n56uG8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1023858705708-v1advd9v26aplpf8hq3j8t4jtfptc12a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

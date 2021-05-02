@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title th:text="'Bản Cập Nhật'"></title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6 col-sm-6">
+								<h4 class="header-title" th:text="'Bản Cập Nhật'"></h4>
+							</div>
+						</div>
+						<hr />
+						<div class="table-responsive">
+							<table id="datatable" class="table table-bordered">
+								<thead>
+									<tr>
+										<th th:text="'Bản Cập Nhật'"></th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="update-version" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title">
+							<span th:text="'Cập Nhật'" th:remove="tag"></span>
+						</h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal"
+							onsubmit="updateForm();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Id'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Id'" id="id" name="id" readonly="readonly"/>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Bản Cập Nhật'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Bản Cập Nhật'" id="version" name="version" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-sm-3"></div>
+								<div class="form-group col-sm-9">
+									<div>
+										<button id="addButton" type="submit" style="width: 60%;"
+											class="btn btn-primary waves-effect waves-light"
+											th:text="#{text.update}"></button>
+										<button type="button"
+											class="btn btn-danger waves-effect waves-light"
+											data-dismiss="modal" th:text="#{text.cancel}"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var vietnameseUrl = [[@{/user/plugins/datatables/Vietnamese.json}]];
+	    var url = [[@{/api/admin/version/search}]];
+	    var editUrl = [[@{/api/admin/version/edit}]];
+	    var csrf_token = [[${_csrf.token}]];
+	    
+	    var id = "";
+	    var table;
+		$(document).ready(function() {
+			table = $('#datatable').DataTable( {
+				"processing": true,
+				"searching": false,
+				"paging": false,
+		        "serverSide": true,
+		        "ajax": {
+		        	type:"POST",
+		            url: url,
+		            dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: function ( d ) {
+		            	return JSON.stringify( d );
+		            }
+		        },
+		        "columns": [
+		            { "data": "version" },
+		            { "data": "id" }
+		        ],
+		        "order": [0, "desc"],
+		        "select": {
+		        	'style': 'multi'
+		        },
+		        "columnDefs": [
+	            {
+	                "render": function ( data, type, row ) {
+	                	return '<button class="btn btn-primary" data-toggle="modal" data-target="#update-version" data-json="' + encodeURI(JSON.stringify(row)) +'"><i class="fa fa-pencil"></i></button>'
+	                },
+	                "orderable": false,
+	                "targets": 1
+	            }
+		        ]
+	        });
+			
+			$('#datatable tbody').on( 'click', 'button', function () {
+				var data = table.row( $(this).parents('tr') ).data();
+				id = data.id;
+		    } );
+
+			$('#update-version').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var jsonStr = $(e.relatedTarget).data('json');
+			  	var row = JSON.parse(decodeURI(jsonStr));
+			  	
+			    //populate the textbox
+			    $("#update-version #version").val(row.version);
+			    $("#update-version #id").val(row.id);
+			}); 
+	    });
+		
+		function updateForm() {
+			var data = {id: id};
+			$("#update-version form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			
+			$.ajax({
+		        url : editUrl,
+		        type: 'PUT',
+		        dataType: "text",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(){
+		        	$('#update-version').modal('hide');
+		        	table.ajax.reload( null, false );
+			    },
+		        error: function(){
+		        	alert("Loi xay ra");
+		        }
+		    });
+			return false;
+		}
+		
+	</script>
+	</div>
+</body>
+</html>

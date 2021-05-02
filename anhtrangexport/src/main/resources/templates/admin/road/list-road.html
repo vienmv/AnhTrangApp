@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title th:text="'Quản Lí Địa Chỉ '"></title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6 col-sm-6">
+								<h4 class="header-title" th:text="'Quản Lí Địa Chỉ Công Ty'"></h4>
+							</div>
+							<div class="col-6 col-sm-6">
+								<a data-toggle="modal" href="" data-target="#add-road" class="pull-right btn btn-primary"><img th:src="@{/user/images/add.png}"
+									height="20" />Thêm mới</a>
+							</div>
+						</div>
+						<hr />
+						<div class="table-responsive">
+							<table id="datatable" class="table table-bordered">
+								<thead>
+									<tr>
+										<th></th>
+										<th th:text="'id'"></th>
+										<th th:text="'Address'"></th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="2"><button id="delButt" class="btn btn-danger">
+												<i class="fa fa-trash"></i>Xóa tất
+											</button></td>
+										<th th:text="'Address'"></th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="'Bạn muốn xóa địa này'"></div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<a class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.delete}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete-multi" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="'Bạn muốn xoá các đại chỉ này'"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<button class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.delete}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="please-select-dialog" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">Vui lòng tích chọn các dòng để xoá?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.cancel}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="add-road" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title">
+							<span th:text="'Thêm mới'" th:remove="tag"></span>
+						</h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" onsubmit="submitForm();return false;">
+							
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'City'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="cityId" name="cityName" onchange="checkNameCity()" >										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Districts'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="districtId" name="districtName" onchange="checkNameDistrict()">										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Wards'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="wardsId" name="wardsName">										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Địa chỉ cụ thể'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'So nha, ten toa nha, ten duong, ten khu vuc, Nhap Địa chỉ cụ thể'" id="address" name="address" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-sm-3"></div>
+								<div class="form-group col-sm-9">
+									<div>
+										<button id="addButton" type="submit" style="width: 60%;" class="btn btn-primary waves-effect waves-light" th:text="#{text.add}"></button>
+										<button type="button" class="btn btn-danger waves-effect waves-light" data-dismiss="modal" th:text="#{text.cancel}"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="update-road" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h6 class="modal-title">
+							<span th:text="'Cập Nhật'" th:remove="tag"></span>
+						</h6>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" onsubmit="updateForm();return false;">
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'City'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="city" name="cityName" onchange="checkNameCityUpdate()" >										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Districts'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="district" name="districtName" onchange="checkNameDistrictUpdate()">										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Wards'"></label>
+								<div class="col-sm-9">
+									<select class="form-control" id="wards" name="wardsName">										
+									</select>
+								</div>								
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-3 form-label" th:text="'Địa chỉ cụ thể'"></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" type="text"
+										th:placeholder="'Số nhà, tên tòa nhà, tên đường, tên khu vực, nhập địa chỉ cụ thể'" id="address" name="address" />
+								</div>
+							</div>
+							<div class="form-group row">
+								<div class="col-sm-3"></div>
+								<div class="form-group col-sm-9">
+									<div>
+										<button id="addButton" type="submit" style="width: 60%;" class="btn btn-primary waves-effect waves-light" th:text="#{text.update}"></button>
+										<button type="button" class="btn btn-danger waves-effect waves-light" data-dismiss="modal" th:text="#{text.cancel}"></button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-export-exel" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<a class="btn btn-success btn-ok" style="color: white;"
+							th:text="#{text.yes}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var vietnameseUrl = [[@{/user/plugins/datatables/Vietnamese.json}]];
+	    var url = [[@{/api/shipper/road/search}]];
+	    var addURL = [[@{/api/shipper/road/add}]];
+	    var editUrl = [[@{/api/shipper/road/update}]];
+	    var delUrl = [[@{/api/shipper/road/delete}]];
+	    var delMultiUrl = [[@{/api/shipper/road/delete-multi}]];
+	    var csrf_token = [[${_csrf.token}]];
+	    var searchHolderText = 'Tìm theo tên tài khoản';
+	    var localJson = [[@{/user/cityJson/local.json}]];
+	    var exportExelUrl = [[@{/api/admin/road/excel/export}]]
+	    var downloadExelUrl = [[@{/admin/file/}]];
+	    var searchDTO = {};
+	    
+	    var id = "";
+	    var table;
+		$(document).ready(function() {
+			table = $('#datatable').DataTable( {
+				"processing": true,
+		        "serverSide": true,
+		        "ajax": {
+		        	type:"POST",
+		            url: url,
+		            dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: function ( d ) {
+		            	return JSON.stringify( d );
+		            	
+		            }
+		        },
+		        "columns": [
+		            { "data": "id" },
+		            { "data": "id" },
+		            { "data": "address" },
+		            { "data": "id" }
+		        ],
+		        "order": [1, "desc"],
+		        "select": {
+		        	'style': 'multi'
+		        },
+		        "columnDefs": [
+	        	{
+				    'targets': 0,
+				    'checkboxes': {
+				       'selectRow': true
+				    }
+				 },
+				 {
+	              "render": function (data, type, row) {
+	            	 let str = "";
+	            	 if(row.cityName != null){
+	            		 str = str + row.wardsName + "-"  + row.districtName + "-"+  row.cityName 
+	            	 }
+		             if(data != null){
+		            	 str = str + "<br/>" + data
+		             }              
+		             return str;
+	              },
+	              "targets": 2
+	            },				 
+	            {
+	                "render": function ( data, type, row ) {
+	                    var content = '<button class="btn btn-primary" data-toggle="modal" data-target="#update-road" data-json="' + encodeURI(JSON.stringify(row)) +'"><i class="fa fa-pencil"></i></button>'
+	                    +'<button class="btn btn-danger " data-toggle="modal" data-target="#confirm-delete" data-id=' + row.id + '><i class="fa fa-trash"></i></button>'
+			            
+			            return content;
+	                },
+	                "orderable": false,
+	                "targets": 3
+	            },
+	          
+		        ],
+		        "language": {
+		            "url": vietnameseUrl,
+		            searchPlaceholder: searchHolderText
+		        },
+		        "initComplete": function(settings, json) {
+		        	$("#datatable_length").append(' <a data-toggle="modal" href="" data-target="#confirm-export-exel" class=" btn btn-success"><i class="fa fa-file-excel-o"></i> Xuất Excel</a>');
+		        }
+	        });
+			
+			$('#datatable tbody').on( 'click', 'button', function () {
+				var data = table.row( $(this).parents('tr') ).data();
+				id = data.id;
+		    } );
+			
+			$('#confirm-delete').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $modalDiv.addClass('loading');
+				  $.ajax({
+				        url : delUrl + '/' + id,
+				        type: 'DELETE',
+				        dataType: "text",
+			            contentType: "application/json",
+				        success: function(data){
+				        	$modalDiv.modal('hide');
+				        	table.ajax.reload( null, false );
+					    },
+				        error: function(error){
+				        }
+				    })
+				});
+			
+			//triggered when modal is about to be shown
+			$('#confirm-delete').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var name = $(e.relatedTarget).data('id');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>' + name + '</strong>');
+			});
+			var rowIds = [];
+			$('#delButt').on('click', function(e){
+			    var rows_selected = table.column(0).checkboxes.selected();
+			    rowIds = [];
+			    // Iterate over all selected checkboxes
+			    $.each(rows_selected, function(index, rowId){
+			       // Create a hidden element
+			       rowIds.push(rowId);
+			    });
+			    if (rows_selected.length == 0) {
+			    	$("#please-select-dialog").modal('show');
+			    } else {
+			    	$("#confirm-delete-multi").modal('show');
+			    }
+		 	});
+			$('#confirm-delete-multi').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.ajax({
+				        url : delMultiUrl + '/' + rowIds.toString(),
+				        type: 'DELETE',
+				        dataType: "text",
+			            contentType: "application/json",
+			            headers: {'X-CSRF-TOKEN': csrf_token},
+				        success: function(data){
+				        	$modalDiv.modal('hide');
+				        	table.ajax.reload( null, false );
+					    }
+				    })
+			});
+			
+			$('#update-road').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var jsonStr = $(e.relatedTarget).data('json');
+			  	var row = JSON.parse(decodeURI(jsonStr));
+			  	
+			    //populate the textbox
+			    $("#update-road #name").val(row.name);
+			    $("#update-road #id").val(row.id);
+			    $("#update-road #city").val(row.cityName);
+			  	$("#update-road #district").val(row.districtName);
+				$("#update-road #wards").val(row.wardsName);
+				$("#update-road #address").val(row.address);
+				 
+				checkNameCityUpdate();
+			});
+			$('#confirm-export-exel').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $modalDiv.find('div.modal-body').html('<strong>Đang tạo file excel. Vui lòng đợi chút nhé!</strong>');
+				  $.ajax({
+				        url: exportExelUrl,
+				        method: 'POST',
+				        dataType: 'text',
+				        contentType: 'application/json;charset=UTF-8',
+				        headers: {'X-CSRF-TOKEN': csrf_token},
+			            data: JSON.stringify(searchDTO),
+				        success: function (data) {
+				            $modalDiv.modal('hide');
+				        	window.location.href=downloadExelUrl + data;
+				        }
+				    });
+				});
+				
+				$('#confirm-export-exel').on('show.bs.modal', function(e) {
+				    $(e.currentTarget).find('div.modal-body').html('<strong>Bạn muốn xuất danh sách nhom nguoi dung ra exel?</strong>');
+				});
+
+	    });
+		
+		function submitForm() {
+			var data = {};
+			$("#add-road form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			data.userId = $('#update-user #id').val();	
+			$.ajax({
+		        url : addURL,
+		        type: 'POST',
+		        dataType: "json",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(){
+		        	$("#add-road form")[0].reset();
+		        	$('#add-road').modal('hide');
+			    	table.draw();
+			    },
+		        error: function(){
+		        	alert("Loi xay ra");
+		        }
+		    });
+			return false;
+		}
+		
+		function updateForm() {
+			var data = {id: id};
+			$("#update-road form").serializeArray().map(function(x) {
+				data[x.name] = x.value;
+			});
+			
+			$.ajax({
+		        url : editUrl,
+		        type: 'PUT',
+		        dataType: "text",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(){
+		        	$('#update-road').modal('hide');
+		        	table.ajax.reload( null, false );
+			    },
+		        error: function(){
+		        	alert("Loi xay ra");
+		        }
+		    });
+			return false;
+		}
+		var cities = [];
+        $.getJSON( localJson, function(json) {
+        	cities = json;
+        	json.forEach(function(v){
+       			$('#add-road #cityId, #update-road #city').append("<option value='" + v.name + "'>" + v.name + "</option>").attr('selected', true);
+       		});
+        	checkNameCity()
+        	//checkNameCityUpdate()
+       	}) ;
+	        
+		var districts = []
+		function checkNameCity() {
+			var cityName = $("#add-road #cityId option:selected").val();
+    		for(i = 0; i < cities.length; i++){
+    			if(cities[i].name === cityName){
+    				districts = cities[i].districts
+    			}
+    		}
+    		$('#add-road #districtId').html("");
+    		districts.forEach(function(v){
+       			$('#add-road #districtId').append("<option value='" + v.name + "'>" + v.name + "</option>");
+       		});
+    		checkNameDistrict()
+    	}
+		
+		var wards = []
+		function checkNameDistrict() {
+			var districtName = $("#add-road #districtId option:selected").val();
+    		for(i = 0; i < districts.length; i++){
+    			if(districts[i].name === districtName){
+    				wards = districts[i].wards
+    			}
+    		}
+    		$('#add-road #wardsId').html("");
+    		wards.forEach(function(v){
+       			$('#add-road #wardsId').append("<option value='" + v.name + "'>" + v.name + "</option>");
+       		});
+		}
+		
+		function checkNameCityUpdate() {
+			var cityName = $("#update-road #city option:selected").val();
+    		for(i = 0; i < cities.length; i++){
+    			if(cities[i].name === cityName){
+    				districts = cities[i].districts
+    			}
+    		}
+    		$('#update-road #district').html("");
+    		districts.forEach(function(v){
+       			$('#update-road #district').append("<option value='" + v.name + "'>" + v.name + "</option>");
+       		});
+    		checkNameDistrictUpdate()
+    	}
+		
+		function checkNameDistrictUpdate() {
+			var districtName = $("#update-road #district option:selected").val();
+    		for(i = 0; i < districts.length; i++){
+    			if(districts[i].name === districtName){
+    				wards = districts[i].wards
+    			}
+    		}
+    		$('#update-road #wards').html("");
+    		wards.forEach(function(v){
+       			$('#update-road #wards').append("<option value='" + v.name + "'>" + v.name + "</option>");
+       		});
+		}
+		
+	</script>
+	</div>
+</body>
+</html>
